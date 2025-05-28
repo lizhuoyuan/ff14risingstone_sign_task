@@ -12,10 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Run FF14 Task
-        continue-on-error: true  # 防止单次失败停止整个Job
-        retry-on-error: true    # 自动重试3次（默认）
         
       - uses: docker://ghcr.io/starhearthunt/ff14risingstone_sign_task:master
         with:
