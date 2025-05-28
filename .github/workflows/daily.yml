@@ -13,19 +13,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: Wandalen/retry-action@v3.5.0
-      with:
-        attempt_limit: 3           # 最多重试 3 次
-        attempt_delay: 10000       # 每次重试间隔 10 秒（单位毫秒）
-        command: |
-        docker run \
-          -e COOKIE="${{ secrets.COOKIE }}" \
-          -e USER_AGENT="${{ secrets.USER_AGENT }}" \
-          ghcr.io/starhearthunt/ff14risingstone_sign_task:master
+      - uses: docker://ghcr.io/starhearthunt/ff14risingstone_sign_task:master
+        with:
+          cookie: ${{ secrets.COOKIE }}
+          user_agent: ${{ secrets.USER_AGENT }}
 
-
-      # - uses: docker://ghcr.io/starhearthunt/ff14risingstone_sign_task:master
-      #   with:
-      #     cookie: ${{ secrets.COOKIE }}
-      #     user_agent: ${{ secrets.USER_AGENT }}
-
+          retry:
+            max-attempts: 3
