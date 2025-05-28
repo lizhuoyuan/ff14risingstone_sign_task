@@ -13,10 +13,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: docker://ghcr.io/starhearthunt/ff14risingstone_sign_task:master
+      - name: Run FF14Risingstone Task with Retry
+        id: run_task
+        uses: docker://ghcr.io/starhearthunt/ff14risingstone_sign_task:master
         with:
           cookie: ${{ secrets.COOKIE }}
           user_agent: ${{ secrets.USER_AGENT }}
+        continue-on-error: true
 
-          retry:
-            max-attempts: 3
+      - name: Retry on Failure (up to 2 times)
+        if: steps.run_task.outcome == 'failure'
+        run: |
+          for i in 1 2; do
+            echo "Retry attempt $i..."
+            docker run \
+              -e COOKIE="${{ secrets.COOKIE }}" \
+              -e USER_AGENT="${{ secrets.USER_AGENT }}" \
+              ghcr.io/starhearthunt/ff14risingstone_sign_task:master && break || sleep 10
+          done
